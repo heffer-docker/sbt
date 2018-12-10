@@ -1,14 +1,13 @@
-ARG JAVA_VERSION=8u192
-FROM heffer/openjdk:${JAVA_VERSION}
+FROM heffer/openjdk:8u192
 LABEL maintainer="Sven Reul <sven@heffer.de>"
 ARG SBT_VERSION=1.2.7
-ADD https://piccolo.link/sbt-${SBT_VERSION}.tgz /tmp/sbt.tgz
-RUN apk --no-cache add bash && \
+RUN apk --no-cache add bash curl && \
+  curl -o /tmp/sbt.tgz -L https://piccolo.link/sbt-${SBT_VERSION}.tgz && \
   cd /opt && \
   tar zxvf /tmp/sbt.tgz && \
   rm -f /tmp/sbt.tgz && \
-  /opt/sbt/bin/sbt exit && \
-  rm -rf /tmp/*
+  apk del curl
 ENV IVY_HOME /opt/ivy2
+ENV PATH $PATH:/opt/sbt/bin
 WORKDIR /opt/build
-ENTRYPOINT ["/opt/sbt/bin/sbt", "-ivy", "/opt/ivy2"]
+ENTRYPOINT ["sbt", "-ivy", "/opt/ivy2"]
